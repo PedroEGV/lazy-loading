@@ -1,35 +1,74 @@
 package com.pedroegv.lazyloading.controller;
 
-import java.util.Arrays;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.pedroegv.lazyloading.domain.LazyLoadingDTO;
+import com.pedroegv.lazyloading.domain.WorkDay;
 import com.pedroegv.lazyloading.service.LazyLoadingService;
 
 @Controller
 public class LazyLoadingController {
 
 	@Autowired
-	private LazyLoadingService lazyLoading;
+	private LazyLoadingService lazyLoadingService;
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String index() {
 		return "index.html";
 	}
 
-	@RequestMapping(value = "/processData", method = RequestMethod.POST)
-	public String processData(@RequestParam("minWeight") Double minWeight,
-			@RequestParam("inputFile") MultipartFile inputFile) {
-		System.out.println("minWeight: " + minWeight);
-		System.out.println("inputFile: " + inputFile.getOriginalFilename());
-		return "index.html";
+	@RequestMapping(value = "/fileContent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody List<WorkDay> getFileContent(
+			@RequestParam MultipartFile inputFile) {
+		File file = new File(inputFile.getOriginalFilename());
+		List<WorkDay> workDays = new ArrayList<WorkDay>();
+		try {
+			String content = new String(inputFile.getBytes(),
+					StandardCharsets.UTF_8);
+			file.createNewFile();
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write(content);
+			bw.close();
+			workDays = lazyLoadingService.loadData(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (file.exists()) {
+				file.delete();
+			}
+		}
+		return workDays;
+	}
+
+	@RequestMapping(value = "/processData", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody List<String> processData(
+			@RequestBody LazyLoadingDTO dto) {
+		Double minWeight = dto.getMinWeight();
+		List<WorkDay> workDays = dto.getWorkDays();
+		System.out.println(minWeight);
+		System.out.println(workDays.size());
+		List<String> results = new ArrayList<String>();
+		for (WorkDay workDay : workDays) {
+			String result = lazyLoadingService.printResult(workDay.getDay(),
+					lazyLoadingService.maxTravels(workDay, minWeight));
+			results.add(result);
+		}
+		return results;
 	}
 }
