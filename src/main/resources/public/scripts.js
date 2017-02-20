@@ -30,8 +30,8 @@ function showContent(data) {
 	$("#file-content").append($("<p>").text("Working days: " + workDays.length));
 	for (var day of workDays) {
 		var details = $("<p>").text("Day #" + day.day + ": ");
-		for (var weight of day.weights) {
-			details.append(weight + " ");
+		for (var element of day.elements) {
+			details.append(element.weight + " ");
 		}
 		$("#file-content").append(details);
 	}
@@ -52,7 +52,7 @@ function sendData(event) {
 
 function showResults(data) {
 	var results = $("#results").empty();
-	for (var result of data) {
-		results.append($("<p>").text(result));
+	for (var day of data) {
+		results.append($("<p>").text("Case #" + day.day + ": " + day.travels));
 	}
 }
