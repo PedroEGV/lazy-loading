@@ -12,7 +12,6 @@ function clear() {
 
 function loadFileContent(event) {
 	clear();
-	$("#no-results").hide();
 	var inputFile = event.target.files[0];
 	var formData = new FormData();
 	formData.append("inputFile", inputFile);
