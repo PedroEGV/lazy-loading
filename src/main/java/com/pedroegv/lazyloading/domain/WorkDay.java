@@ -5,6 +5,10 @@ public class WorkDay {
 	private Integer day;
 	private Double[] weights;
 
+	public WorkDay() {
+
+	}
+
 	public WorkDay(Integer day, Double[] weights) {
 		super();
 		this.day = day;
