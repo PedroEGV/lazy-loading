@@ -8,11 +8,11 @@ $(document).ready(function () {
 
 function clear() {
 	$("#file-content").empty();
-	$("#results").empty().text("No results.");
 }
 
 function loadFileContent(event) {
 	clear();
+	$("#no-results").hide();
 	var inputFile = event.target.files[0];
 	var formData = new FormData();
 	formData.append("inputFile", inputFile);
@@ -40,7 +40,12 @@ function showContent(data) {
 function sendData(event) {
 	event.preventDefault();
 	var minWeight = $("#min-weight").val();
+	var customerId = $("#customer-id").val();
+	workDays.forEach(function (day) {
+			day.customerId = customerId;
+		});
 	var data = {"minWeight": minWeight, "workDays": workDays};
+	alert("from client: " + JSON.stringify(data));
 	$.ajax({
 			url: "http://localhost:8080/processData",
 			type: "POST",
@@ -51,7 +56,9 @@ function sendData(event) {
 }
 
 function showResults(data) {
-	var results = $("#results").empty();
+	var results = $("#results");
+	alert("from server: " + JSON.stringify(data));
+	results.append($("<h3>").text(data[0].customerId));
 	for (var day of data) {
 		results.append($("<p>").text("Case #" + day.day + ": " + day.travels));
 	}
