@@ -44,7 +44,6 @@ function sendData(event) {
 			day.customerId = customerId;
 		});
 	var data = {"minWeight": minWeight, "workDays": workDays};
-	alert("from client: " + JSON.stringify(data));
 	$.ajax({
 			url: "http://localhost:8080/processData",
 			type: "POST",
@@ -56,7 +55,6 @@ function sendData(event) {
 
 function showResults(data) {
 	var results = $("#results");
-	alert("from server: " + JSON.stringify(data));
 	results.append($("<h3>").text(data[0].customerId));
 	for (var day of data) {
 		results.append($("<p>").text("Case #" + day.day + ": " + day.travels));
