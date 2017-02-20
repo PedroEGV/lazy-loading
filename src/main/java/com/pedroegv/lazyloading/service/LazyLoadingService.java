@@ -1,31 +1,39 @@
 package com.pedroegv.lazyloading.service;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.pedroegv.lazyloading.domain.WorkDay;
+import com.pedroegv.lazyloading.domain.Element;
+import com.pedroegv.lazyloading.domain.LazyLoading;
+import com.pedroegv.lazyloading.repository.LazyLoadingRepository;
 
 @Service
 public class LazyLoadingService {
 
-	public int maxTravels(WorkDay workDay, Double minWeight) {
-		Double[] weights = workDay.getWeights();
-		LinkedList<Double> sortedWeights = new LinkedList<Double>(
-				Arrays.asList(weights));
-		Collections.sort(sortedWeights);
+	@Autowired
+	private LazyLoadingRepository lazyLoadingRepository;
+
+	public LazyLoading maxTravels(LazyLoading lazyLoading, Double minWeight) {
+		LinkedList<Element> sortedWeights = new LinkedList<Element>(
+				lazyLoading.getElements());
+		Collections.sort(sortedWeights, new Comparator<Element>() {
+			@Override
+			public int compare(Element e1, Element e2) {
+				return e1.getWeight() - e2.getWeight() < 0 ? -1 : 1;
+			}
+		});
 		int travels = 0;
 		while (!sortedWeights.isEmpty()) {
-			Double topElement = sortedWeights.getLast();
+			Double topElement = sortedWeights.getLast().getWeight();
 			sortedWeights.removeLast();
 			int inTheBag = 1;
 			while (inTheBag * topElement < minWeight
@@ -37,28 +45,29 @@ public class LazyLoadingService {
 				travels++;
 			}
 		}
-		return travels;
+		lazyLoading.setTravels(travels);
+		lazyLoadingRepository.save(lazyLoading);
+		return lazyLoading;
 	}
 
-	public String printResult(int day, int travels) {
-		String result = "Case #" + day + ": " + travels;
-		System.out.println(result);
-		return result;
-	}
-
-	public List<WorkDay> loadData(File file) {
-		List<WorkDay> workDays = new ArrayList<WorkDay>();
+	public List<LazyLoading> loadData(File file) {
+		List<LazyLoading> workDays = new ArrayList<LazyLoading>();
 		Scanner scanner = null;
 		try {
 			scanner = new Scanner(file);
 			int days = scanner.nextInt();
 			for (int day = 0; day < days; day++) {
-				int elements = scanner.nextInt();
-				Double[] weights = new Double[elements];
-				for (int element = 0; element < elements; element++) {
-					weights[element] = scanner.nextDouble();
+				LazyLoading lazyLoading = new LazyLoading();
+				lazyLoading.setDay(day + 1);
+				int weights = scanner.nextInt();
+				List<Element> elements = new ArrayList<Element>();
+				for (int i = 0; i < weights; i++) {
+					Element element = new Element();
+					element.setWeight(scanner.nextDouble());
+					elements.add(element);
 				}
-				workDays.add(new WorkDay(day + 1, weights));
+				lazyLoading.setElements(elements);
+				workDays.add(lazyLoading);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

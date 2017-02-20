@@ -18,8 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.pedroegv.lazyloading.domain.LazyLoading;
 import com.pedroegv.lazyloading.domain.LazyLoadingDTO;
-import com.pedroegv.lazyloading.domain.WorkDay;
+import com.pedroegv.lazyloading.repository.LazyLoadingRepository;
 import com.pedroegv.lazyloading.service.LazyLoadingService;
 
 @Controller
@@ -27,6 +28,9 @@ public class LazyLoadingController {
 
 	@Autowired
 	private LazyLoadingService lazyLoadingService;
+	
+	@Autowired
+	private LazyLoadingRepository lazyLoadingRepository;
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String index() {
@@ -34,10 +38,10 @@ public class LazyLoadingController {
 	}
 
 	@RequestMapping(value = "/fileContent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody List<WorkDay> getFileContent(
+	public @ResponseBody List<LazyLoading> getFileContent(
 			@RequestParam MultipartFile inputFile) {
 		File file = new File(inputFile.getOriginalFilename());
-		List<WorkDay> workDays = new ArrayList<WorkDay>();
+		List<LazyLoading> workDays = new ArrayList<LazyLoading>();
 		try {
 			String content = new String(inputFile.getBytes(),
 					StandardCharsets.UTF_8);
@@ -57,18 +61,13 @@ public class LazyLoadingController {
 	}
 
 	@RequestMapping(value = "/processData", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody List<String> processData(
+	public @ResponseBody Iterable<LazyLoading> processData(
 			@RequestBody LazyLoadingDTO dto) {
 		Double minWeight = dto.getMinWeight();
-		List<WorkDay> workDays = dto.getWorkDays();
-		System.out.println(minWeight);
-		System.out.println(workDays.size());
-		List<String> results = new ArrayList<String>();
-		for (WorkDay workDay : workDays) {
-			String result = lazyLoadingService.printResult(workDay.getDay(),
-					lazyLoadingService.maxTravels(workDay, minWeight));
-			results.add(result);
+		List<LazyLoading> workDays = dto.getWorkDays();
+		for (LazyLoading lazyLoading : workDays) {
+			lazyLoadingService.maxTravels(lazyLoading, minWeight);
 		}
-		return results;
+		return lazyLoadingRepository.findAll();
 	}
 }
