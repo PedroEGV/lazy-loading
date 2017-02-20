@@ -40,8 +40,10 @@ public class LazyLoadingService {
 		return travels;
 	}
 
-	public void printResult(int day, int travels) {
-		System.out.println("Case #" + day + ": " + travels);
+	public String printResult(int day, int travels) {
+		String result = "Case #" + day + ": " + travels;
+		System.out.println(result);
+		return result;
 	}
 
 	public List<WorkDay> loadData(File file) {
