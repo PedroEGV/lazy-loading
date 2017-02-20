@@ -42,6 +42,7 @@ function sendData(event) {
 	var customerId = $("#customer-id").val();
 	workDays.forEach(function (day) {
 			day.customerId = customerId;
+			day.date = new Date();
 		});
 	var data = {"minWeight": minWeight, "workDays": workDays};
 	$.ajax({
@@ -55,7 +56,7 @@ function sendData(event) {
 
 function showResults(data) {
 	var results = $("#results");
-	results.append($("<h3>").text(data[0].customerId));
+	results.append($("<h3>").text(data[0].customerId + " @ " + new Date(data[0].date)));
 	for (var day of data) {
 		results.append($("<p>").text("Case #" + day.day + ": " + day.travels));
 	}

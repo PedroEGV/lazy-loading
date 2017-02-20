@@ -1,5 +1,6 @@
 package com.pedroegv.lazyloading.domain;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -24,6 +25,8 @@ public class LazyLoading {
 	private List<Element> elements;
 	@Column
 	private Integer travels;
+	@Column
+	private Date date;
 
 	public LazyLoading() {
 
@@ -73,6 +76,14 @@ public class LazyLoading {
 
 	public void setTravels(Integer travels) {
 		this.travels = travels;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
 	}
 
 }
