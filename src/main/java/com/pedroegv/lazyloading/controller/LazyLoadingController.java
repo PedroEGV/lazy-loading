@@ -28,7 +28,7 @@ public class LazyLoadingController {
 
 	@Autowired
 	private LazyLoadingService lazyLoadingService;
-	
+
 	@Autowired
 	private LazyLoadingRepository lazyLoadingRepository;
 
@@ -68,6 +68,6 @@ public class LazyLoadingController {
 		for (LazyLoading lazyLoading : workDays) {
 			lazyLoadingService.maxTravels(lazyLoading, minWeight);
 		}
-		return lazyLoadingRepository.findAll();
+		return workDays;
 	}
 }
