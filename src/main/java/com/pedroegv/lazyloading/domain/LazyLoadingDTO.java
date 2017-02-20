@@ -5,13 +5,13 @@ import java.util.List;
 public class LazyLoadingDTO {
 
 	private Double minWeight;
-	private List<WorkDay> workDays;
+	private List<LazyLoading> workDays;
 
 	public LazyLoadingDTO() {
 
 	}
 
-	public LazyLoadingDTO(Double minWeight, List<WorkDay> workDays) {
+	public LazyLoadingDTO(Double minWeight, List<LazyLoading> workDays) {
 		super();
 		this.minWeight = minWeight;
 		this.workDays = workDays;
@@ -25,11 +25,11 @@ public class LazyLoadingDTO {
 		this.minWeight = minWeight;
 	}
 
-	public List<WorkDay> getWorkDays() {
+	public List<LazyLoading> getWorkDays() {
 		return workDays;
 	}
 
-	public void setWorkDays(List<WorkDay> workDays) {
+	public void setWorkDays(List<LazyLoading> workDays) {
 		this.workDays = workDays;
 	}
 
